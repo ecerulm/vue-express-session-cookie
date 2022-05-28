@@ -1,11 +1,35 @@
 <script setup>
+import { inject }  from 'vue';
 import LoginNavItem from './LoginNavItem.vue';
 const props = defineProps({
   title: String
 })
+
+const flashes = inject('flashes')
+
+function removeFlash(flashMessage) {
+  console.log('removeFlash', flashMessage)
+  var index = flashes.indexOf(flashMessage);
+  if (index !== -1) {
+    flashes.splice(index, 1);
+  }
+}
+
+
 </script>
 
 <template>
+
+<TransitionGroup name="list" tag="div">
+  <div v-for="flash in flashes" :key="flash"  class="alert alert-danger" role="alert" style="margin: 5px 20px 5px 20px;">
+    {{ flash }}
+    <button type="button" class="btn-close float-end" @click="removeFlash(flash)" aria-label="Close"></button>
+  </div>
+
+
+
+</TransitionGroup>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">{{ title }}</a>
@@ -45,3 +69,15 @@ const props = defineProps({
   </div>
 </nav>
 </template>
+
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+</style>
