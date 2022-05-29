@@ -1,7 +1,7 @@
 <script setup>
 import { v4 as uuidv4 } from 'uuid';
 import { ref, inject, onMounted } from 'vue';
-import { login } from '@/apiclient.js'
+import { login, loggedInStatus, logout } from '@/apiclient.js'
 import {addFlash} from '@/flashes.js'
 
 
@@ -19,7 +19,8 @@ function errHandler(error) {
 </script>
 
 <template>
-    <form class="d-flex" @submit.prevent="login(this.email, this.password, this.errHandler)">
+    <button v-if="loggedInStatus" @click="logout" class="btn btn-outline-success">Logout</button>
+    <form v-else class="d-flex" @submit.prevent="login(this.email, this.password, this.errHandler)">
         <input class="form-control me-2" type="email" v-model="email" placeholder="enter your email">
         <input class="form-control me-2" type="password" v-model="password" placeholder="enter your password">
         <button class="btn btn-outline-success" type="submit">Login</button>
