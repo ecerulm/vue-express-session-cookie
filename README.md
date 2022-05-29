@@ -1,6 +1,6 @@
 # What is this project? 
 
-This is just an example of my own reference. 
+This is just an example for my own reference. 
 
 * SPA login/logout flow using session cookies.
 * API authentication using session cookies 
