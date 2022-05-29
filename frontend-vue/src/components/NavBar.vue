@@ -1,19 +1,12 @@
 <script setup>
-import { inject }  from 'vue';
 import LoginNavItem from './LoginNavItem.vue';
+import {flashes, removeFlash} from '@/flashes.js'
+
 const props = defineProps({
   title: String
 })
 
-const flashes = inject('flashes')
 
-function removeFlash(flashMessage) {
-  console.log('removeFlash', flashMessage)
-  var index = flashes.indexOf(flashMessage);
-  if (index !== -1) {
-    flashes.splice(index, 1);
-  }
-}
 
 
 </script>

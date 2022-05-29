@@ -2,16 +2,18 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ref, inject, onMounted } from 'vue';
 import { login } from '@/apiclient.js'
+import {addFlash} from '@/flashes.js'
+
+
 const myid = uuidv4();
 
 const email = ref("ddd@ddd.com");
 const password = ref("dddd");
-const flashes = inject('flashes')
 
 
 function errHandler(error) {
     console.log("errHandler")
-    flashes.push("Login incorrect"+error);
+    addFlash("Login incorrect: "+error);
 }
 
 </script>
