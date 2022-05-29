@@ -32,6 +32,7 @@ app.use(bodyParser.json())
 app.use(session({
   secret: crypto.randomBytes(20).toString('hex'),
   saveUninitialized: false,
+  resave: false,
 }
 ))
 
@@ -58,6 +59,18 @@ app.post('/api/login', (req,res) => {
   res.status(401)
   res.json({code: "auth_failed", message: "Authentication failed"});
   }
+})
+
+app.get("/api/userinfo", (req,res) => {
+  logger.info("userinfo: %s", req.session.username);
+  res.json({loggedInStatus: Boolean(req.session.username), username: req.session.username })
+})
+
+app.post("/api/logout", (req, res) => {
+  logger.info("logging out: ", req.session.username);
+  req.session.destroy(() => {
+    res.json({code: "success"})
+  })
 })
 
 
