@@ -1,2 +1,4 @@
 *.key
 myCA.pem
+*.crt
+*.csr
