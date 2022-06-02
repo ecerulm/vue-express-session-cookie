@@ -10,17 +10,38 @@ This is just an example for my own reference.
 * Flash messages 
 * Bootstrap 5 
 
+# Genereate HTTPS certificates so that you can use Secure cookies
+
+```
+cd certs
+
+# Generate a random passphrase and store it in the keychain 
+security add-generic-password -a $USER -s myCApassphrase -w $(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9$./,:' | fold -w 32| head -n 1)
+
+./myCA.sh
+./localhostCert.sh
+```
+
+`./myCA.sh` will generate a root CA certificate and install it as trusted in you Keychain (macOS)
+`./localhostCert.sh` will generate a server certificate signed by the root CA generated in the previous step. 
+
+The generated `localhost.crt` and `localhost.key` will be automatically used in `frontend-vue/vite.config.js` if they are present.
+
+
 # Start both the frontend server and backend server
 
 ```
+export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)
+
 cd backend-express
 npm run serve
+
 cd frontend-vue
 npm run dev
 ```
 
 The backend listens for requests at http://localhost:6000
-The frontend listen for request at http://localhost:3000 but it proxies request to `/api/*` to the backend server. 
+The frontend listen for request at http://localhost:3000  or https://localhost:3000 but it proxies request to `/api/*` to the backend server. 
 
 That is required so that the frontend and api have the same origin (protocol, host and **port**) so that the session cookie is sent in the API requests from javascript.
 
