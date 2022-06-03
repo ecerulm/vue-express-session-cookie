@@ -27,21 +27,28 @@ security add-generic-password -a $USER -s myCApassphrase -w $(cat /dev/urandom |
 
 The generated `localhost.crt` and `localhost.key` will be automatically used in `frontend-vue/vite.config.js` if they are present.
 
+The browser (Safari, Chrome) will use the macOS Keychain , so if our CA is trusted in the KeyChain it's also trusted by the browser. 
+
+Node.js on the other hand does not look for trusted root CA in the macOS KeyChain so you will need to add this CA to the trusted certificates in node.js (with the environment variable `NODE_EXTRA_CA_CERTS`)
+
+
 
 # Start both the frontend server and backend server
 
 ```
 export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)
-export NODE_EXTRA_CA_CERTS="../certs/myCA.pem" npm run dev
 cd backend-express
 npm install
 npm run serve
 
 ```
 
+For the frontend we need to add the root CA file `myCA.pem` to `NODE_EXTRA_CA_CERTS` as node.js does not look into the macOS X KeyChain for root CAs, it has it's own list. See [Allow Node to use certificates from the macOS Keychain when making HTTPS requests ](https://github.com/nodejs/node/issues/39657). 
+
 
 ```
 export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)
+export NODE_EXTRA_CA_CERTS="../certs/myCA.pem" npm run dev
 cd frontend-vue
 npm install
 npm run dev
@@ -63,8 +70,19 @@ It will show a flash message saying `Login incorrect`
 In order to login, you need to put the same value for username and for password. 
 
 
-Then click again on Login and you will be able to login
+Then click again on Login and you will be able to login. 
 
+The successful login will set the session cookie `connect.sid` and set the maxAge to 1 hour. 
+
+If running on HTTPS it will get the Secure attribute in the cookie. 
+
+
+
+
+
+# TODO 
+
+* Set cookie name to `__Host-connect.sid` 
 
 
 

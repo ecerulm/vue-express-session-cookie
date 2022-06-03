@@ -14,6 +14,12 @@ var httpsOptions = false;
 //   export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)
 // before  running npm run dev
 if (fs.existsSync(path.resolve(__dirname, '../certs/localhost.crt'))) {
+  if (!process.env.PASSPHRASE) {
+    console.log("The environment variable PASSPHRASE with the passphrase for the certificate key is not set. Exiting...")
+    console.log("export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)")
+    process.exit(1)
+  }
+
   httpsOptions = {
       key: fs.readFileSync(path.resolve(__dirname, '../certs/localhost.key')),
       cert: fs.readFileSync(path.resolve(__dirname, '../certs/localhost.crt')),
