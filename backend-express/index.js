@@ -6,6 +6,8 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const crypto = require('crypto');
+const https = require('https');
+
 require('dotenv').config()
 
 
@@ -83,6 +85,22 @@ app.use(function(req,res) {
     res.send("File not found!");
 });
 
-app.listen(6000, function() {
+
+var httpsOptions = {}
+if (fs.existsSync(path.resolve(__dirname, '../certs/localhost.crt'))) {
+   if (!process.env.PASSPHRASE) {
+     console.log("The environment variable PASSPHRASE with the passphrase for the certificate key is not set. Exiting...")
+     process.exit(1)
+   }
+
+   httpsOptions = {
+       key: fs.readFileSync(path.resolve(__dirname, '../certs/localhost.key')),
+       cert: fs.readFileSync(path.resolve(__dirname, '../certs/localhost.crt')),
+       passphrase: process.env.PASSPHRASE,
+   }
+ }
+
+
+var server = https.createServer(httpsOptions, app).listen(6000, function() {
     console.log('App started on port 6000');
 });

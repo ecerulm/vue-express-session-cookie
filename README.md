@@ -32,11 +32,18 @@ The generated `localhost.crt` and `localhost.key` will be automatically used in 
 
 ```
 export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)
-
+export NODE_EXTRA_CA_CERTS="../certs/myCA.pem" npm run dev
 cd backend-express
+npm install
 npm run serve
 
+```
+
+
+```
+export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)
 cd frontend-vue
+npm install
 npm run dev
 ```
 

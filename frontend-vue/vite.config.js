@@ -36,7 +36,7 @@ export default defineConfig({
     https: httpsOptions,
     proxy: {
       '/api': {
-        target: 'http://localhost:6000/',
+        target: `${httpsOptions ? 'https' : 'http'}://localhost:6000/`,
         changeOrigin: true,
       }
     }
