@@ -40,11 +40,32 @@ const logger = winston.createLogger({
   });
   
 
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+  
+  app.use((req,res,next) => {
+    // to protect agains CSRF require X-Requested-With , the browser SOP will prevent cross site request with non-standard headers
+    if (req.get('x-requested-with') === undefined) {
+      logger.info('Reject request because no x-requested-with header was present')
+      res.status(415).json({message: "This server only allows request with x-requested-with header set to prevent CSRF attacks"})
+      return;
+    }
+    
+    // allow only requests with content-type: application/json 
+    // for GET request with empty body we allow any content-type. 
+    // this prevents CRSF attacks as browser SOP disallows cross-site request if content-type is application/json'
+    if (!req.is('json') && req.body) { //req.body will be undefined if no empty body (bodyParser.json() middleware is not run yet)
+      logger.info('Reject request because content-type was %s and body was %s', req.get('content-type'), req.body )
+      res.status(415).json({message: "This server only allows request with content-type set to application/json to prevent CSRF attacks"})
+      return
+    }
+    
+    next()
+  })
 
-// parse application/json
-app.use(bodyParser.json())
+  // parse application/x-www-form-urlencoded
+  app.use(bodyParser.urlencoded({ extended: false }))
+  
+  // parse application/json
+  app.use(bodyParser.json())
 
 // TODO: use connect-mongo
 app.use(session({

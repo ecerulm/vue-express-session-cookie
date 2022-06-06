@@ -59,7 +59,13 @@ npm run lint
 
 # TODO 
 
-* Look into CORS setup , can we have the API and the frontend in different origins (protocol, host, port)
+* Require content-type `application/json` in the API. Browsers will refuse to make cross-site requests for that content-type
+* Require non-standard headers in the API, `X-Requested-With`. Browser will refuse to make cross-site request if non-standard headers are present
+* Make session cookie a SameSite cookie
+* Make session cookie `__Host-` prefix
+* Add hash-based double submit CSRF cookie
+  * __Host- and SameSite
+  
 
 
 

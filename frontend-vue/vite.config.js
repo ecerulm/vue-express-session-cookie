@@ -44,7 +44,9 @@ export default defineConfig({
       '/api': {
         target: `${httpsOptions ? 'https' : 'http'}://localhost:6000/`,
         changeOrigin: true,
+
       }
-    }
+    },
+    cors: false, // prevent vite from addind access-control-allow-origin: *
   }
 });

@@ -48,7 +48,7 @@ For the frontend we need to add the root CA file `myCA.pem` to `NODE_EXTRA_CA_CE
 
 ```
 export PASSPHRASE=$(security find-generic-password -a $USER -s myCApassphrase -w)
-export NODE_EXTRA_CA_CERTS="../certs/myCA.pem" npm run dev
+export NODE_EXTRA_CA_CERTS="../certs/myCA.pem"
 cd frontend-vue
 npm install
 npm run dev
@@ -77,6 +77,18 @@ The successful login will set the session cookie `connect.sid` and set the maxAg
 If running on HTTPS it will get the Secure attribute in the cookie. 
 
 
+# Noteworthy concepts about session cookies and CSRF attacks
+
+The first line of defense agains CSRF attacks is that the API requires `Content-Type: application/json` and the non-standard header `X-Requested-With`, browser will block cross domain requests for those
+* See [MDN - CORS - Simple requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#simple_requests)
+* so the API requires those. 
+
+**TODO**:  SameSite / Secure for the session cookie, tells the browser that if the **originating** domain of the request is not the original domain, the cookie should not be sent. 
+So if  a malicious domain makes a cross-domain request to our API the session cookie (authentication toke) will not be included in the request.
+
+**TODO**: `__Host-` prefix for session cookie, makes so that the **target** domain for the cookie is restricted to the current host. 
+No subdomain will receive the cookie.
+No subdomain can overwrite the cookie. 
 
 
 

@@ -2,7 +2,13 @@ import axios from 'axios';
 import {reactive,ref} from 'vue';
 import { addFlash } from './flashes';
 
-const axiosConfig = {timeout:5000}
+const axiosConfig = {
+    timeout:5000,
+    headers: {
+        'Content-Type': 'application/json', 
+        'X-Requested-With': 'Axios'
+    }
+}
 
 export const loggedInStatus = ref(false);
 
@@ -22,7 +28,7 @@ export function login(email,password, err) {
 
 export function updateLoggedInStatus() {
     console.log('checkLoginStatus')
-    axios.get('/api/userinfo', {}, axiosConfig)
+    axios.get('/api/userinfo', axiosConfig)
     .then((response) => {
         console.log('checkLoginStatus response was', response)
         loggedInStatus.value = Boolean(response.data.loggedInStatus)
