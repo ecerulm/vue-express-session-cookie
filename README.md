@@ -88,18 +88,34 @@ The first line of defense agains CSRF attacks is that the API requires `Content-
 The session cookie has the attribute SameSite / Secure . 
 This tells the browser that if the **originating** domain of the request is not the original domain, the cookie should not be sent. 
 So if  a malicious domain makes a cross-domain request to our API the session cookie (authentication toke) will not be included in the request.
+In principle, this alone should be enough to prevent CSRF attacks since in 2022 [SameSite browser support](https://caniuse.com/same-site-cookie-attribute) is 94% percent. 
+But to protect the 6% of users using older browsers you need to implement hash-based double submit cookie 
 
-**TODO**: `__Host-` prefix for session cookie, makes so that the **target** domain for the cookie is restricted to the current host. 
+`__Host-` prefix for session cookie, makes so that the **target** domain for the cookie is restricted to the current host. 
 No subdomain will receive the cookie.
 No subdomain can overwrite the cookie. Prevents session fixation attacks
+
+The hash-based double submit cookie (antiCSRF token) is designed so that the javascript originating the request must prove that it knows 
+an unguessable value bound to the session. 
+This is equivalent to know the session cookie value. 
+If the attacker knew the session cookie value already it wouldn't need to perform a CSRF attack in the first place. 
+The whole point of CSRF is that the attacker doesn't know how to authenticate as the user but it tries to trick the user's browser
+into making an authenticated requests. 
+
+The csrf cookie is called `__Host-csrfToken`, it has `SameSite: Strict` and `HttpOnly: false`. 
+That way it can't be overwritten from subdomains (in case of subdomain hijacking). 
+It can't be used in cross site requests (SameSite).
+It can be read from client side javacript (but only from javascript originating from the host that set the cookie). 
+
+The client side javascript must for each request read the `__Host-csrfToken` cookie and send its value as a `X-CSRF-Token` header. The API will check that the received `X-CSRF-Token` actually matches the SHA-256 of the `req.sessionID`
+
 
 
 
 
 # TODO 
 
-* Set cookie name to `__Host-connect.sid` 
-
+* Implement hash-based double submit cookie (anti CSRF token)
 
 
 # References

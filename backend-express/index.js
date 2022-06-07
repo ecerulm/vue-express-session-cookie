@@ -81,6 +81,16 @@ app.use(session({
 }
 ))
 
+// This is not protected with X-CSRF-Token because this call is allowed even 
+// with no session 
+app.get("/api/userinfo", (req,res) => {
+  logger.info("userinfo: %s", req.session.username);
+  res.json({loggedInStatus: Boolean(req.session.username), username: req.session.username })
+})
+
+
+// This is also no protected with X-CSRF-Token because this is called
+// before we can have a session
 app.post('/api/login', (req,res) => {
   const username = req.body.username
   const password = req.body.password
@@ -93,6 +103,13 @@ app.post('/api/login', (req,res) => {
       logger.info("regenerate session %s err: %s", req.session.id, err)
       req.session.username = username
       req.session.extra = req.session.id
+      req.session.myCounter = 0
+
+      // set the csrfToken cookie, this can be read from browser javacript because of httpOnly:false
+      // even if an attacker get the csrfToken it can't obtain the session cookie from it
+      // SHA-256 is one-way hash
+      const csrfToken = crypto.createHash('sha256').update(req.sessionID).digest('hex')
+      res.cookie("__Host-csrfToken", csrfToken, {httpOnly: false, sameSite: 'Strict', secure: true, maxAge: 3600*1000})
   
       res.json({code: "success", message: `succesfully authenticated ${req.session.id}`}) 
     });
@@ -106,10 +123,40 @@ app.post('/api/login', (req,res) => {
   }
 })
 
-app.get("/api/userinfo", (req,res) => {
-  logger.info("userinfo: %s", req.session.username);
-  res.json({loggedInStatus: Boolean(req.session.username), username: req.session.username })
+
+
+// Check if authenticated and  the anti CSRF token header
+// all the endpoints after this middleware require 
+// * an authenticated session
+// * the X-CSRF-Token
+app.use((req,res,next) => {
+  if (!req.session.username) {
+    res.status(401).json({message: "No session or session not authenticated"});
+    return
+  }
+  const receivedCsrfToken = req.get('X-CSRF-Token')
+
+  const expectedCsrfToken = crypto.createHash('sha256').update(req.sessionID).digest('hex')
+
+  if (receivedCsrfToken != expectedCsrfToken) {
+    logger.warn('The request failed the CSRF headr check. receivedCsrfToken = %s', receivedCsrfToken)
+    res.status(401).json({message: "The request failed the X-CSRF-Token header check"})
+    return
+  }
+  next()
+
 })
+
+
+// This is the only "real" API operation 
+app.post("/api/increaseCounter", (req, res) => {
+  req.session.myCounter++
+  logger.info("myCounter increased to %s", req.session.myCounter)
+  res.json({myCounter: req.session.myCounter})
+})
+
+
+
 
 app.post("/api/logout", (req, res) => {
   logger.info("logging out: ", req.session.username);
