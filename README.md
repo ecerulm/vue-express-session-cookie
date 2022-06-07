@@ -79,16 +79,20 @@ If running on HTTPS it will get the Secure attribute in the cookie.
 
 # Noteworthy concepts about session cookies and CSRF attacks
 
+The session cookie `Max-Age` is set to 1 hour.
+
 The first line of defense agains CSRF attacks is that the API requires `Content-Type: application/json` and the non-standard header `X-Requested-With`, browser will block cross domain requests for those
 * See [MDN - CORS - Simple requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#simple_requests)
 * so the API requires those. 
 
-**TODO**:  SameSite / Secure for the session cookie, tells the browser that if the **originating** domain of the request is not the original domain, the cookie should not be sent. 
+The session cookie has the attribute SameSite / Secure . 
+This tells the browser that if the **originating** domain of the request is not the original domain, the cookie should not be sent. 
 So if  a malicious domain makes a cross-domain request to our API the session cookie (authentication toke) will not be included in the request.
 
 **TODO**: `__Host-` prefix for session cookie, makes so that the **target** domain for the cookie is restricted to the current host. 
 No subdomain will receive the cookie.
-No subdomain can overwrite the cookie. 
+No subdomain can overwrite the cookie. Prevents session fixation attacks
+
 
 
 

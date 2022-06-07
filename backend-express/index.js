@@ -72,7 +72,9 @@ app.use(session({
   secret: crypto.randomBytes(20).toString('hex'),
   saveUninitialized: false,
   resave: false,
+  name: "__Host-connect.sid", // https://github.com/expressjs/session#name
   cookie: {
+    sameSite: 'strict',
     secure: Object.keys(httpsOptions).length != 0,
     maxAge: 3600*1000, // 1 hour 
   }
