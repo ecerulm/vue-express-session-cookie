@@ -112,12 +112,6 @@ The client side javascript must for each request read the `__Host-csrfToken` coo
 
 
 
-
-# TODO 
-
-* Implement hash-based double submit cookie (anti CSRF token)
-
-
 # References
 * [API Security in Action](https://www.manning.com/books/api-security-in-action) by Neil Madden. Manning Publications
 * [express-session](https://github.com/expressjs/session)
