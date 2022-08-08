@@ -10,7 +10,7 @@ This is just an example for my own reference.
 * Flash messages 
 * Bootstrap 5 
 
-# Genereate HTTPS certificates so that you can use Secure cookies
+# Generate HTTPS certificates so that you can use Secure cookies
 
 ```
 cd certs
