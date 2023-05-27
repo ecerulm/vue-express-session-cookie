@@ -18,3 +18,8 @@ The API endpoints are
   * will invalidate the current session
 * `/api/userinfo` check if the user is logged in
   * if the session cookie value is associated to a session that has a `username` attribute then it means that's logged in 
+* `/api/increaseCounter`  increases a counter that is stored in the `req.session`
+
+
+The session storage works like this
+* here we are using the regular `express-session` the data is actually store in the cookie itself (encrypted) 
